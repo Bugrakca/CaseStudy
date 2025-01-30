@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "CaseStudyCharacter.generated.h"
 
+class UBHotBarComponent;
 class UBInteractionComponent;
 class UInputComponent;
 class USkeletalMeshComponent;
@@ -33,6 +34,9 @@ class ACaseStudyCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere)
 	UBInteractionComponent* InteractionComponent;
 
+	UPROPERTY(VisibleAnywhere)
+	UBHotBarComponent* HotBarComp;
+
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -51,6 +55,18 @@ class ACaseStudyCharacter : public ACharacter
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* HotBar1Action;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* HotBar2Action;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* HotBar3Action;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* HotBar4Action;
 	
 public:
 	ACaseStudyCharacter();
@@ -63,6 +79,11 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 	void Interact();
+
+	void HotBar1();
+	void HotBar2();
+	void HotBar3();
+	void HotBar4();
 
 protected:
 	// APawn interface

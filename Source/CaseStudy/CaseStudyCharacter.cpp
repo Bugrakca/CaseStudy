@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "CaseStudyCharacter.h"
+
+#include "BHotBarComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -29,6 +31,7 @@ ACaseStudyCharacter::ACaseStudyCharacter()
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
 	InteractionComponent = CreateDefaultSubobject<UBInteractionComponent>(TEXT("InteractionComponent"));
+	HotBarComp = CreateDefaultSubobject<UBHotBarComponent>(TEXT("HotBarComp"));
 
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
@@ -73,6 +76,18 @@ void ACaseStudyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 		// Interacting
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ACaseStudyCharacter::Interact);
+
+		// HotBar 1
+		EnhancedInputComponent->BindAction(HotBar1Action, ETriggerEvent::Started, this, &ACaseStudyCharacter::HotBar1);
+
+		// HotBar 2
+		EnhancedInputComponent->BindAction(HotBar2Action, ETriggerEvent::Started, this, &ACaseStudyCharacter::HotBar2);
+
+		// HotBar 3
+		EnhancedInputComponent->BindAction(HotBar3Action, ETriggerEvent::Started, this, &ACaseStudyCharacter::HotBar3);
+
+		// HotBar 4
+		EnhancedInputComponent->BindAction(HotBar4Action, ETriggerEvent::Started, this, &ACaseStudyCharacter::HotBar4);
 	}
 	else
 	{
@@ -113,4 +128,44 @@ void ACaseStudyCharacter::Interact()
 	{
 		InteractionComponent->PrimaryInteract();
 	}
+}
+
+void ACaseStudyCharacter::HotBar1()
+{
+	if (HotBarComp->GetItemAtIndex(0).Name.IsEmpty())
+	{
+		return;
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("%s"), *HotBarComp->GetItemAtIndex(0).Name.ToString()));
+}
+
+void ACaseStudyCharacter::HotBar2()
+{
+	if (HotBarComp->GetItemAtIndex(1).Name.IsEmpty())
+	{
+		return;
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("%s"), *HotBarComp->GetItemAtIndex(1).Name.ToString()));
+}
+
+void ACaseStudyCharacter::HotBar3()
+{
+	if (HotBarComp->GetItemAtIndex(2).Name.IsEmpty())
+    {
+    	return;
+    }
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("%s"), *HotBarComp->GetItemAtIndex(2).Name.ToString()));
+}
+
+void ACaseStudyCharacter::HotBar4()
+{
+	if (HotBarComp->GetItemAtIndex(3).Name.IsEmpty())
+	{
+		return;
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("%s"), *HotBarComp->GetItemAtIndex(3).Name.ToString()));
 }
