@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "CaseStudyGameMode.h"
+
+#include "EnvironmentQuery/EnvQueryManager.h"
 #include "UObject/ConstructorHelpers.h"
 
 ACaseStudyGameMode::ACaseStudyGameMode()
@@ -9,12 +11,14 @@ ACaseStudyGameMode::ACaseStudyGameMode()
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonCharacter"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
+	SpawnTimeInterval = 5.0f;
+
 }
 
-void ACaseStudyGameMode::BeginPlay()
+void ACaseStudyGameMode::StartPlay()
 {
-	Super::BeginPlay();
-	
+	Super::StartPlay();
+
 	TArray<FVector> SpawnLocations = {
 		FVector(1700.0f, 1200.0f, 0.0f),  // Location 1
 		FVector(1700.0f, 1300.0f, 0.0f), // Location 2
@@ -25,6 +29,9 @@ void ACaseStudyGameMode::BeginPlay()
 	{
 		SpawnActorAtLocation(Location);
 	}
+	
+
+	GetWorldTimerManager().SetTimer(TimerHandle_AISpawn, this, &ACaseStudyGameMode::SpawnAITimerElapsed, SpawnTimeInterval, true);
 }
 
 void ACaseStudyGameMode::SpawnActorAtLocation(const FVector& Location)
@@ -44,5 +51,31 @@ void ACaseStudyGameMode::SpawnActorAtLocation(const FVector& Location)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Failed to spawn Actor at Location: %s"), *Location.ToString());
 		}
+	}
+}
+
+void ACaseStudyGameMode::SpawnAITimerElapsed()
+{
+	UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(this, SpawnAIQuery, this, EEnvQueryRunMode::RandomBest5Pct, nullptr);
+	if (QueryInstance)
+	{
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ACaseStudyGameMode::OnQueryCompleted);
+	}
+}
+
+void ACaseStudyGameMode::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus)
+{
+
+	if (QueryStatus != EEnvQueryStatus::Success)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawn AI EQS Failed!"))
+		return;
+	}
+	
+	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
+
+	if (Locations.Num() > 0)
+	{
+		GetWorld()->SpawnActor<AActor>(AIClass, Locations[0], FRotator::ZeroRotator);
 	}
 }
